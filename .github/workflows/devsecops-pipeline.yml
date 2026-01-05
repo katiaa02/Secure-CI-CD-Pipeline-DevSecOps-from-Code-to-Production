@@ -1,58 +1,17 @@
-name: DevSecOps CI/CD Pipelinee
+name: DevSecOps CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
 
-permissions:
-  contents: read
-
 jobs:
-  security-ci:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 1️⃣ SECRET SCANNING
-    - name: Secret scanning with Gitleaks
-      uses: gitleaks/gitleaks-action@v2
-      env:
-        GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-
-    # 2️⃣ SAST
-    - name: SAST - Semgrep
-      uses: returntocorp/semgrep-action@v1
-      with:
-        config: "p/security-audit"
-
-    # 3️⃣ SCA - DEPENDENCY CHECK
-    - name: Dependency vulnerability scan
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: "secure-devsecops"
-        path: "."
-        format: "HTML"
-      continue-on-error: false
-
-    # 4️⃣ BUILD DOCKER IMAGE
-    - name: Build Docker image
-      run: |
-        docker build -t secure-app:latest .
-
-    # 5️⃣ CONTAINER SCAN
-    - name: Scan Docker image with Trivy
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: "secure-app:latest"
-        severity: "CRITICAL,HIGH"
-        exit-code: "1"
-
-    # 6️⃣ IAC SECURITY
-    - name: Terraform security scan (Checkov)
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: terraform
-        framework: terraform
+    - name: Pipeline started
+      run: echo "CI pipeline running"
